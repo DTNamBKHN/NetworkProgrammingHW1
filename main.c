@@ -283,8 +283,9 @@ int main()
 	readDataFromFile(&list);
     printSingleList(list);
     //Menu
-    char input[50];
     int choice;
+    char input[50];
+    int count = 0; //count the number of loop, if count > 0, then need to delete '\n' in buffer 
     do{
         printf("****************************\n");
         printf("USER MANAGEMENT PROGRAM\n");
@@ -296,11 +297,20 @@ int main()
         printf("5. Change password\n");
         printf("6. Sign out\n");
         printf("Your choice (1-6, other to quit): ");
-        scanf("%s", input);
+        if (count > 0 )
+            while( getchar() != '\n' );
+        fgets(input, 50, stdin);
+        if ((strlen(input) > 0) && (input[strlen (input) - 1] == '\n'))
+            input[strlen (input) - 1] = '\0';
+        if (strpbrk(input, " ") != NULL){
+            printf("Goodbye1\n");
+            return 0;
+        }
         choice = atoi(input);
+        printf("%d\n", choice);
+        printf("%s\n", input);
         switch(choice){
             case 1:{
-                while ((getchar()) != '\n');
                 char username[50], pass[20];
                 printf("\n---------Register---------\n");
                 printf("Username: ");
@@ -320,10 +330,10 @@ int main()
                     alterDataOfFile(list);
                     printf("Successful registration. Activation required.\n");
                 }
-                 break;
+                count++;
+                break;
             }
             case 2:{
-                while ((getchar()) != '\n');
                 char username[50], pass[20], code[10];
                 int wrong_code_count = 0;
                 printf("\n---------Activate---------\n");
@@ -352,15 +362,15 @@ int main()
                     blockAccount(list, username);
                     alterDataOfFile(list);
                 }
+                count++;
                 break;
             }
             case 3:{
                 char user_name[50], pass[20];
-                while ((getchar()) != '\n');
                 printf("\n---------Sign In---------\n");
                 printf("Username: ");
-				        scanf("%s", user_name);
-				        if (searchAccount(list, user_name)){//check if account exist ?
+                scanf("%s", user_name);
+                if (searchAccount(list, user_name)){//check if account exist ?
                     if(checkBlocked(list, user_name) != 1){//check if account is blocked?
                         int wrong_pass_count = 0;
                         while(1){
@@ -375,13 +385,13 @@ int main()
                                 element.status = returnStatus(list, user_name);
                                 insertEnd(&signedInList, element);//insert signed in account in 
                                 break;
-							              }
-							              else{
+							}
+							else{
                                 if (wrong_pass_count == 3)
                                     break;
                                 printf("Password is incorrect\n");
                                 wrong_pass_count++;
-							              }
+							}
                         }
                         if (wrong_pass_count == 3){
                             printf("Password is incorrect. Account is blocked\n");
@@ -396,13 +406,13 @@ int main()
                 }
                 else{
                     printf("Cannot find account\n");
-				        }
+				}
+                count++;
                 break;
             }
             case 4:{
                 printf("\n---------Search---------\n");
                 char user_name[50];
-                while ((getchar()) != '\n');
                 printf("Username: ");
                 scanf("%s", user_name);
                 if (searchAccount(list, user_name)){
@@ -420,11 +430,11 @@ int main()
                 else{
                     printf("Cannot find account\n");
                 }
+                count++;
                 break;
             }
             case 5:{
                 char user_name[50], pass[20], new_pass[20];
-                while ((getchar()) != '\n');
                 printf("\n---------Change Password---------\n");
                 printf("Username: ");
                 scanf("%s", user_name);
@@ -444,10 +454,10 @@ int main()
                 else{
                     printf("Cannot find account\n");
                 }
+                count++;
                 break;
             }
             case 6:{
-                while ((getchar()) != '\n');
                 printf("\n---------Sign out---------\n");
                 char user_name[50];
                 printf("Username: ");
@@ -460,15 +470,16 @@ int main()
                     else{
                         printf("Account is not sign in\n");
                     }
-              }
-              else{
+                }
+                else{
                     printf("Cannot find account\n");
-				      }
+				}
+                count++;
                 break;
             }
             default:
                 printf("Goodbye\n");
-                break;
+                return 0;
         }
     } while (choice >= 1 && choice <= 6);
     return 0;
