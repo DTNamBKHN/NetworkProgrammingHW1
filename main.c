@@ -315,7 +315,7 @@ int main()
                 username[strlen (username) - 1] = '\0';
                 if (strpbrk(username, " ") != NULL){
                     printf("Username cannot have space!\n");
-                    count++;
+                    count = 0;//because deleted \n 
                     break;
                 }
                 //scanf("%s", username);
