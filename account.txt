@@ -1,5 +1,5 @@
 hedspi1 hedspi2016 0
-hust hust123 1
-soict soictfit 1
+hust hust 1
+soict 123 1
 it4062 123456 1
-
+it4063 123 2

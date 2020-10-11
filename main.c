@@ -138,7 +138,6 @@ void readDataFromFile(singleList *list){
         //take next character from file.
         chr = getc(fp);
     }
-    printf("%d\n", count_lines);
     fseek(fp, 0, SEEK_SET);
     for(int i = 0; i < count_lines; i++){
       fscanf(fp, "%s %s %d", element.user_name, element.password, &element.status);
@@ -281,12 +280,12 @@ int main()
     }
 	createSingleList(&list);
 	readDataFromFile(&list);
-    printSingleList(list);
     //Menu
     int choice;
     char input[50];
-    int count = 0; //count the number of loop, if count > 0, then need to delete '\n' in buffer 
+    int count = 0; //count: mark if '\n' is in buffer or not, if count > 0, then need to delete '\n' in buffer 
     do{
+        printSingleList(list);
         printf("****************************\n");
         printf("USER MANAGEMENT PROGRAM\n");
         printf("----------------------------\n");
@@ -303,23 +302,29 @@ int main()
         if ((strlen(input) > 0) && (input[strlen (input) - 1] == '\n'))
             input[strlen (input) - 1] = '\0';
         if (strpbrk(input, " ") != NULL){
-            printf("Goodbye1\n");
+            printf("Goodbye\n");
             return 0;
         }
         choice = atoi(input);
-        printf("%d\n", choice);
-        printf("%s\n", input);
         switch(choice){
             case 1:{
                 char username[50], pass[20];
                 printf("\n---------Register---------\n");
                 printf("Username: ");
-                scanf("%s", username);
+                fgets(username, 50, stdin);
+                username[strlen (username) - 1] = '\0';
+                if (strpbrk(username, " ") != NULL){
+                    printf("Username cannot have space!\n");
+                    count++;
+                    break;
+                }
+                //scanf("%s", username);
                 if (searchAccount(list, username) == 1){
                     printf("\nAccount existed\n");
+                    count = 0;//because no use scanf like else case below, there is no need to delete '\n' in buffer when read input
+                    break;
                 }
                 else{
-                    while ((getchar()) != '\n');
                     printf("Password: ");
                     scanf("%s", pass);
                     elementtype element;
@@ -329,9 +334,9 @@ int main()
                     insertEnd(&list, element);
                     alterDataOfFile(list);
                     printf("Successful registration. Activation required.\n");
+                    count++;
+                    break;
                 }
-                count++;
-                break;
             }
             case 2:{
                 char username[50], pass[20], code[10];
@@ -450,9 +455,11 @@ int main()
                     }
                     else
                         printf("Current password is incorrect. Please try again\n");
-			        	}
+			    }
                 else{
                     printf("Cannot find account\n");
+                    count = 0;
+                    break;
                 }
                 count++;
                 break;
